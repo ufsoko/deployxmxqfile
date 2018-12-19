@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block body %}
+<script type="text/javascript">
+function doSubmit() {
+document.getElementById("buttonId").disabled=true;
+document.getElementById("formId").submit();
+}
+</script>
+<form action="{{ url_for('create') }}" method=post class=add-entry enctype='multipart/form-data' id="formId">
+	<h3>存在项目:</h3>
+	{% if projectlist %}
+    		{% for poj in projectlist %}
+	   		<span>  {{ poj }}  </span>
+  		{% endfor %}
+        {% else %}
+             没有项目目录
+        {% endif %}
+	<h3>创建项目:</h3>
+	<div class="boxrinput">
+		<dd>项目名字:<input type=text size=30 name=projectname ></dd>
+		<dd>URL名称:<input type=text size=30 name=urlname ></dd>
+	</div>
+	<input type=submit value=创建 onclick="doSubmit()" id="buttonId">
+</form>
+
+{% endblock %}

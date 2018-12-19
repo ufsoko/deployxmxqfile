@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block body %}
+<script type="text/javascript">
+function doSubmit() {
+document.getElementById("buttonId").disabled=true;
+document.getElementById("formId").submit();
+}
+</script>
+<form action="{{ url_for('upload') }}" method=post class=add-entry enctype='multipart/form-data' id="formId">
+	<h3>存在项目:</h3>
+	{% if projectlist %}
+    		{% for poj in projectlist %}
+	   		<dd><input type=radio name=dirs value={{poj}}>:{{ poj }}</dd>
+  		{% endfor %}
+        {% else %}
+             没有项目目录
+        {% endif %}
+	<h3>上传文件:</h3>
+	<div class="boxrinput">
+		<dd>FILE:<input type=file size=30 name=file ></dd>
+	</div>
+	<input type=submit value=部署 onclick="doSubmit()" id="buttonId">
+  </form>
+
+{% endblock %}
