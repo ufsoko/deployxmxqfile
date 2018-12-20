@@ -10,6 +10,7 @@ sys.setdefaultencoding('utf-8')
 app = Flask(__name__)
 app.secret_key='ldx'
 xmxqpath=os.path.join("/","data","nginx","nginx","html","xmxq_auto")
+xmxqhtnlfile = os.path.join("/","data","nginx","nginx","html","xmxq_auto.html")
 
 ALLOWED_EXTENSIONS = set(['zip'])
 
@@ -115,17 +116,21 @@ def reduction():
     lists = getProjectList()
     return render_template("reduction.html",projectlist = lists)
 
-def createUrl(project,urlname,flag): 
-    filename = os.path.join("/","data","nginx","nginx","html","xmxq_auto.html")
-    fn = open(filename,"r")
+
+def readHtml():
+    fn = open(xmxqhtnlfile,"r")
     readdata=fn.readlines()
     fn.close()
-    fn = open(filename,"w")
+    return readdata
+
+def createUrl(project,urlname,flag): 
+    readdata = readHtml()
+    fn = open(xmxqhtnlfile,"w")
     for data in readdata:
         if flag:
             if 'class="xmxq_auto"' in data:
                 fn.write(data)
-		fn.write('<h3><a href="http://172.16.124.3/xmxq_auto/'+project+'/xmxq/index.html" target=_blank>'+urlname+'</a></h3>')
+		fn.write('<h3><a href="http://172.16.124.3/xmxq_auto/'+project+'/xmxq/" target=_blank>'+urlname+'</a></h3>')
             else:
 	        fn.write(data)
         else:
@@ -137,14 +142,37 @@ def createUrl(project,urlname,flag):
 		fn.write(data)	
     fn.close()
 
+def deleteUrl(project): 
+    delpath = os.path.join(xmxqpath,str(project))
+    if os.path.exists(delpath):
+        shutil.rmtree(delpath)
+    readdata = readHtml()
+    fn = open(xmxqhtnlfile,"w")
+    for data in readdata:
+        poj = re.search('xmxq_auto\/(.*?)\/xmxq',data)
+        if poj and project == poj.group(1):
+            pass
+	else:
+   	    fn.write(data)	
+    fn.close()
+
+@app.route("/delete",methods=["POST","GET"])
+def delete():
+    if request.method == "POST":
+        project = request.form.get('dirs')
+        if not project:
+            return redirect(url_for('delete'))
+        deleteUrl(project)
+        flash("delete "+str(project)+" success")
+    lists = getProjectList()
+    return render_template("delete.html",projectlist = lists)
+    
 
 @app.route("/create",methods=["POST","GET"])
 def create():
     if request.method == "POST":
         urlname = request.form.get("urlname")
-        print urlname
         project = request.form.get("projectname")
-        print project
         if project:
             newproject = os.path.join(xmxqpath,project)
             if not os.path.isdir(newproject):
@@ -168,6 +196,8 @@ def choose():
         return redirect(url_for('create'))
     elif choose == "update":
         return redirect(url_for('update'))
+    elif choose == "delete":
+	return redirect(url_for('delete'))
     else:
         return redirect(url_for("reduction"))
 
@@ -176,5 +206,5 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',port=4908)
+    app.run(host='0.0.0.0',port=4906)
     pass

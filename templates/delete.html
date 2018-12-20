@@ -6,7 +6,7 @@ document.getElementById("buttonId").disabled=true;
 document.getElementById("formId").submit();
 }
 </script>
-<form action="{{ url_for('reduction') }}" method=post class=add-entry enctype='multipart/form-data' id="formId">
+<form action="{{ url_for('delete') }}" method=post class=add-entry enctype='multipart/form-data' id="formId">
 	<h3>存在项目:</h3>
 	{% if projectlist %}
     		{% for poj in projectlist %}
@@ -16,7 +16,7 @@ document.getElementById("formId").submit();
              没有项目目录
         {% endif %}
         <br/>
-	<input type=submit value=还原 onclick="doSubmit()" id="buttonId">
+	<input type=submit value=删除 onclick="doSubmit()" id="buttonId">
   </form>
 
 {% endblock %}
